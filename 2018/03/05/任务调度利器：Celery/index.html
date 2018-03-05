@@ -79,14 +79,17 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="title">
-<meta property="og:url" content="http://ryamen.com/title/index.html">
+<meta name="description" content="Celery是Python开发的分布式任务调度模块，今天抽空看了一下，果然接口简单，开发容易，5分钟就写出了一个异步发送邮件的服务。 Celery本身不含消息服务，它使用第三方消息服务来传递任务，目前，Celery支持的消息服务有RabbitMQ、Redis甚至是数据库，当然Redis应该是最佳选择。 安装Celery 用pip或easy_install安装： $ sudo pip install">
+<meta property="og:type" content="article">
+<meta property="og:title" content="任务调度利器：Celery">
+<meta property="og:url" content="http://ryamen.com/2018/03/05/任务调度利器：Celery/index.html">
 <meta property="og:site_name" content="Ryamen&#39;s blogs">
+<meta property="og:description" content="Celery是Python开发的分布式任务调度模块，今天抽空看了一下，果然接口简单，开发容易，5分钟就写出了一个异步发送邮件的服务。 Celery本身不含消息服务，它使用第三方消息服务来传递任务，目前，Celery支持的消息服务有RabbitMQ、Redis甚至是数据库，当然Redis应该是最佳选择。 安装Celery 用pip或easy_install安装： $ sudo pip install">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-05T05:06:53.334Z">
+<meta property="og:updated_time" content="2018-03-05T08:14:46.362Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="title">
+<meta name="twitter:title" content="任务调度利器：Celery">
+<meta name="twitter:description" content="Celery是Python开发的分布式任务调度模块，今天抽空看了一下，果然接口简单，开发容易，5分钟就写出了一个异步发送邮件的服务。 Celery本身不含消息服务，它使用第三方消息服务来传递任务，目前，Celery支持的消息服务有RabbitMQ、Redis甚至是数据库，当然Redis应该是最佳选择。 安装Celery 用pip或easy_install安装： $ sudo pip install">
 
 
 
@@ -116,13 +119,13 @@
 
 
 
-  <link rel="canonical" href="http://ryamen.com/title/"/>
+  <link rel="canonical" href="http://ryamen.com/2018/03/05/任务调度利器：Celery/"/>
 
 
 
 
 
-  <title>title | Ryamen's blogs</title>
+  <title>任务调度利器：Celery | Ryamen's blogs</title>
   
 
 
@@ -217,33 +220,159 @@
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ryamen.com/2018/03/05/任务调度利器：Celery/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ryamen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ryamen's blogs">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-	<h1 class="post-title" itemprop="name headline">title</h1>
-
-
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
+          <h1 class="post-title" itemprop="name headline">任务调度利器：Celery</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-05T16:08:54+08:00">
+                2018-03-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
           
-        
-      </div>
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
       
+
+      
+        <p>Celery是Python开发的分布式任务调度模块，今天抽空看了一下，果然接口简单，开发容易，5分钟就写出了一个异步发送邮件的服务。</p>
+<p>Celery本身不含消息服务，它使用第三方消息服务来传递任务，目前，Celery支持的消息服务有RabbitMQ、Redis甚至是数据库，当然Redis应该是最佳选择。</p>
+<p>安装Celery</p>
+<p>用pip或easy_install安装：</p>
+<p>$ sudo pip install Celery<br>或着：</p>
+<p>$ sudo easy_install Celery<br>使用Redis作为Broker时，再安装一个celery-with-redis。</p>
+<p>开始编写tasks.py：</p>
+<h1 id="tasks-py"><a href="#tasks-py" class="headerlink" title="tasks.py"></a>tasks.py</h1><p>import time<br>from celery import Celery</p>
+<p>celery = Celery(‘tasks’, broker=’redis://localhost:6379/0’)</p>
+<p>@celery.task<br>def sendmail(mail):<br>    print(‘sending mail to %s…’ % mail[‘to’])<br>    time.sleep(2.0)<br>    print(‘mail sent.’)<br>然后启动Celery处理任务：</p>
+<p>$ celery -A tasks worker –loglevel=info<br>上面的命令行实际上启动的是Worker，如果要放到后台运行，可以扔给supervisor。</p>
+<p>如何发送任务？非常简单：</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>from tasks import sendmail<br>sendmail.delay(dict(<a href="mailto:to=&#39;celery@python.org" target="_blank" rel="noopener">to=&#39;celery@python.org</a>‘))<br>&lt;AsyncResult: 1a0a9262-7858-4192-9981-b7bf0ea7483b&gt;<br>可以看到，Celery的API设计真的非常简单。</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>然后，在Worker里就可以看到任务处理的消息：</p>
+<p>[2013-08-27 19:20:23,363: WARNING/MainProcess] <a href="mailto:celery@MichaeliMac.local" target="_blank" rel="noopener">celery@MichaeliMac.local</a> ready.<br>[2013-08-27 19:20:23,367: INFO/MainProcess] consumer: Connected to redis://localhost:6379/0.<br>[2013-08-27 19:20:45,618: INFO/MainProcess] Got task from broker: tasks.sendmail[1a0a9262-7858-4192-9981-b7bf0ea7483b]<br>[2013-08-27 19:20:45,655: WARNING/PoolWorker-4] sending mail to <a href="mailto:celery@python.org" target="_blank" rel="noopener">celery@python.org</a>…<br>[2013-08-27 19:20:47,657: WARNING/PoolWorker-4] mail sent.<br>[2013-08-27 19:20:47,658: INFO/MainProcess] Task tasks.sendmail[1a0a9262-7858-4192-9981-b7bf0ea7483b] succeeded in 2.00266814232s: None<br>Celery默认设置就能满足基本要求。Worker以Pool模式启动，默认大小为CPU核心数量，缺省序列化机制是pickle，但可以指定为json。由于Python调用UNIX/Linux程序实在太容易，所以，用Celery作为异步任务框架非常合适。</p>
+<p>Celery还有一些高级用法，比如把多个任务组合成一个原子任务等，还有一个完善的监控接口，以后有空再继续研究。</p>
+
       
     </div>
     
     
     
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/05/协程/" rel="next" title="协程的理解">
+                <i class="fa fa-chevron-left"></i> 协程的理解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
@@ -276,8 +405,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -339,6 +477,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#tasks-py"><span class="nav-number">1.</span> <span class="nav-text">tasks.py</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
